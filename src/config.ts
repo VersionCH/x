@@ -10,7 +10,7 @@ export const siteConfig: SiteConfig = {
 	themeColor: { hue: 345, fixed: false },
 	banner: {
 		enable: false,
-		src: "/images/banner.svg",
+		src: "public/images/Image_1793201625861_996.jpg",
 		position: "center",
 		credit: { enable: false, text: "", url: "" },
 	},
