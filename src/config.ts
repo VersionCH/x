@@ -34,7 +34,7 @@ export const navBarConfig: NavBarConfig = {
 export const twikooConfig = { envId: "" };
 
 export const profileConfig: ProfileConfig = {
-	avatar: "/images/avatar.svg",
+	avatar: "/images/Image_1793201625861_996.jpg",
 	name: "YUNXI",
 	bio: "记录生活、学习和正在发生的小事。",
 	links: [
