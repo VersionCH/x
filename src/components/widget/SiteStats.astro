@@ -1,0 +1,123 @@
+---
+import { Icon } from "astro-icon/components";
+import { siteConfig } from "../../config";
+import { getSortedPostsList } from "../../utils/content-utils";
+
+const posts = await getSortedPostsList();
+const categories = new Set(posts.map((post) => post.data.category || "未分类"));
+const tags = new Set(posts.flatMap((post) => post.data.tags));
+const latest = posts[0]?.data.published;
+const latestText = latest ? new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(latest)) : "暂无";
+---
+
+<site-stats class="stats-widget card-base" aria-labelledby="stats-title" data-started-at={siteConfig.siteStartedAt}>
+    <div class="widget-topline">
+        <div class="widget-title"><span class="widget-icon"><Icon name="material-symbols:analytics-rounded" /></span><h2 id="stats-title">站点统计</h2></div>
+        <span class="widget-index">05</span>
+    </div>
+
+    <div class="stats-runtime">
+        <Icon class="runtime-status-icon" name="material-symbols:radio-button-partial-outline" />
+        <div class="runtime-copy"><small>本站已运行</small><strong data-site-runtime>正在计算…</strong></div>
+        <Icon class="runtime-timer-icon" name="material-symbols:timer-rounded" />
+    </div>
+
+    <div class="stats-grid stats-traffic-grid" aria-label="访问统计">
+        <div><Icon name="material-symbols:visibility-outline-rounded" /><strong id="busuanzi_value_page_pv" data-busuanzi="page_pv">--</strong><span>本页访问</span></div>
+        <div><Icon name="material-symbols:group-outline-rounded" /><strong id="busuanzi_value_site_uv" data-busuanzi="site_uv">--</strong><span>总访客</span></div>
+        <div><Icon name="material-symbols:bar-chart-rounded" /><strong id="busuanzi_value_site_pv" data-busuanzi="site_pv">--</strong><span>总访问</span></div>
+    </div>
+
+    <div class="stats-summary"><span>最近更新：{latestText}</span><strong>{posts.length} 篇文章</strong></div>
+    <div class="stats-content-meta"><span><Icon name="material-symbols:category-outline-rounded" /> {categories.size} 个分类</span><span><Icon name="material-symbols:label-outline-rounded" /> {tags.size} 个标签</span></div>
+</site-stats>
+
+<script is:inline>
+    (() => {
+        const setupStats = () => {
+            document.querySelectorAll("site-stats").forEach((stats) => {
+                if (stats.dataset.initialized === "true") return;
+                stats.dataset.initialized = "true";
+
+                const updateRuntime = () => {
+                    const startedAt = new Date(stats.dataset.startedAt || "2026-01-01T00:00:00+08:00").getTime();
+                    const elapsed = Math.max(0, Date.now() - startedAt);
+                    const totalSeconds = Math.floor(elapsed / 1000);
+                    const days = Math.floor(totalSeconds / 86400);
+                    const hours = Math.floor((totalSeconds % 86400) / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                    const seconds = totalSeconds % 60;
+                    const runtime = stats.querySelector("[data-site-runtime]");
+                    if (runtime) runtime.textContent = `${days} 天 ${String(hours).padStart(2, "0")} 时 ${String(minutes).padStart(2, "0")} 分 ${String(seconds).padStart(2, "0")} 秒`;
+                };
+                updateRuntime();
+
+                const fallbackKey = "blog-blog-local-traffic";
+                const today = new Date().toISOString().slice(0, 10);
+                let fallback = { date: today, pagePv: 0, sitePv: 0, siteUv: 0, visitorMarked: false };
+                try { fallback = { ...fallback, ...JSON.parse(localStorage.getItem(fallbackKey) || "{}") }; } catch {}
+                if (fallback.date !== today) fallback = { date: today, pagePv: 0, sitePv: fallback.sitePv || 0, siteUv: fallback.siteUv || 0, visitorMarked: false };
+                fallback.pagePv += 1;
+                fallback.sitePv += 1;
+                if (!fallback.visitorMarked) { fallback.siteUv += 1; fallback.visitorMarked = true; }
+                try { localStorage.setItem(fallbackKey, JSON.stringify(fallback)); } catch {}
+
+                const values = { page_pv: fallback.pagePv, site_pv: fallback.sitePv, site_uv: fallback.siteUv };
+                stats.querySelectorAll("[data-busuanzi]").forEach((element) => { element.textContent = String(values[element.dataset.busuanzi] || 0); });
+
+                if (!document.querySelector("script[data-traffic-counter]")) {
+                    const script = document.createElement("script");
+                    script.src = "https://cdn.jsdelivr.net/npm/busuanzi@2.3.0/bsz.pure.mini.js";
+                    script.async = true;
+                    script.dataset.trafficCounter = "true";
+                    document.head.appendChild(script);
+                }
+            });
+
+            const runtimeWindow = window;
+            if (!runtimeWindow.__blogStatsRuntimeTimer) {
+                runtimeWindow.__blogStatsRuntimeTimer = window.setInterval(() => {
+                    document.querySelectorAll("site-stats").forEach((stats) => {
+                        const startedAt = new Date(stats.dataset.startedAt || "2026-01-01T00:00:00+08:00").getTime();
+                        const totalSeconds = Math.floor(Math.max(0, Date.now() - startedAt) / 1000);
+                        const days = Math.floor(totalSeconds / 86400);
+                        const hours = Math.floor((totalSeconds % 86400) / 3600);
+                        const minutes = Math.floor((totalSeconds % 3600) / 60);
+                        const seconds = totalSeconds % 60;
+                        const runtime = stats.querySelector("[data-site-runtime]");
+                        if (runtime) runtime.textContent = `${days} 天 ${String(hours).padStart(2, "0")} 时 ${String(minutes).padStart(2, "0")} 分 ${String(seconds).padStart(2, "0")} 秒`;
+                    });
+                }, 1000);
+            }
+        };
+        setupStats();
+        document.addEventListener("astro:page-load", setupStats);
+    })();
+</script>
+
+<style>
+    .stats-widget { padding: 1rem; }
+    .widget-topline, .widget-title { display: flex; align-items: center; }
+    .widget-topline { justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px dashed color-mix(in srgb, var(--deep-text) 14%, transparent); }
+    .widget-title { gap: 0.55rem; }
+    .widget-title h2 { margin: 0; color: var(--deep-text); font-size: 1.08rem; }
+    .widget-icon { display: grid; place-items: center; width: 1.9rem; aspect-ratio: 1; border: 1px solid color-mix(in srgb, var(--primary) 18%, transparent); border-radius: 0.65rem; color: var(--primary); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+    .widget-icon :global(svg) { width: 1.1rem; height: 1.1rem; }
+    .widget-index { padding: 0.15rem 0.45rem; border: 1px solid color-mix(in srgb, var(--primary) 15%, transparent); border-radius: 0.45rem; color: var(--primary); font-size: 0.65rem; font-weight: 800; }
+    .stats-runtime { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.8rem; padding: 0.65rem 0.7rem; border: 1px dashed color-mix(in srgb, var(--deep-text) 15%, transparent); border-radius: 0.75rem; color: var(--primary); background: color-mix(in srgb, var(--primary) 5%, transparent); }
+    .runtime-status-icon { flex: 0 0 auto; color: color-mix(in srgb, var(--primary) 65%, var(--deep-text)); }
+    .runtime-copy { display: flex; min-width: 0; flex-direction: column; gap: 0.12rem; }
+    .runtime-copy small { color: color-mix(in srgb, var(--deep-text) 55%, transparent); font-size: 0.65rem; }
+    .runtime-copy strong { overflow: hidden; color: var(--deep-text); font-size: 0.76rem; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+    .runtime-timer-icon { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin-left: auto; color: color-mix(in srgb, var(--deep-text) 48%, transparent); }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-top: 0.65rem; }
+    .stats-grid div { display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 0.1rem; padding: 0.55rem 0.25rem; border: 1px solid color-mix(in srgb, var(--deep-text) 12%, transparent); border-radius: 0.65rem; background: color-mix(in srgb, var(--card-bg) 42%, transparent); }
+    .stats-grid :global(svg) { width: 0.95rem; height: 0.95rem; color: var(--primary); }
+    .stats-grid strong { max-width: 100%; overflow: hidden; color: var(--deep-text); font-size: 1rem; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+    .stats-grid span { color: color-mix(in srgb, var(--deep-text) 55%, transparent); font-size: 0.6rem; white-space: nowrap; }
+    .stats-summary { display: flex; justify-content: space-between; gap: 0.4rem; margin-top: 0.7rem; padding-top: 0.65rem; border-top: 1px dashed color-mix(in srgb, var(--deep-text) 14%, transparent); color: color-mix(in srgb, var(--deep-text) 55%, transparent); font-size: 0.67rem; }
+    .stats-summary strong { color: var(--primary); white-space: nowrap; }
+    .stats-content-meta { display: flex; justify-content: space-between; gap: 0.35rem; margin-top: 0.55rem; color: color-mix(in srgb, var(--deep-text) 48%, transparent); font-size: 0.62rem; }
+    .stats-content-meta span { display: inline-flex; align-items: center; gap: 0.22rem; }
+    .stats-content-meta :global(svg) { width: 0.78rem; height: 0.78rem; color: var(--primary); }
+</style>
