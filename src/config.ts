@@ -3,7 +3,7 @@ import { LinkPreset } from "./types/config";
 
 // 公开站点信息；部署前替换为你自己的内容。
 export const siteConfig: SiteConfig = {
-	title: "My Little Blog",
+	title: "𝕏𝕀𝔽𝕐𝕌ℕ",
 	subtitle: "",
 	siteStartedAt: "2026-01-01",
 	lang: "zh_CN",
@@ -35,7 +35,7 @@ export const twikooConfig = { envId: "" };
 
 export const profileConfig: ProfileConfig = {
 	avatar: "/images/avatar.svg",
-	name: "Your Name",
+	name: "YUNXI",
 	bio: "记录生活、学习和正在发生的小事。",
 	links: [
 		// 示例：{ name: "Bilibili", icon: "fa6-brands:bilibili", url: "https://space.bilibili.com/你的编号" },
