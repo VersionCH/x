@@ -10,12 +10,12 @@ export const siteConfig: SiteConfig = {
 	themeColor: { hue: 345, fixed: false },
 	banner: {
 		enable: false,
-		src: "public/images/Image_1793201625861_996.jpg",
+		src: "/images/Image_1793201625861_996.jpg",
 		position: "center",
 		credit: { enable: false, text: "", url: "" },
 	},
 	toc: { enable: true, depth: 2 },
-	favicon: [{ src: "/images/avatar.svg", sizes: "any" }],
+	favicon: [{ src: "/images/Image_1793201625861_996.jpg", sizes: "any" }],
 };
 
 export const navBarConfig: NavBarConfig = {
