@@ -5,7 +5,7 @@ import { LinkPreset } from "./types/config";
 export const siteConfig: SiteConfig = {
 	title: "𝕏𝕀𝔽𝕐𝕌ℕ",
 	subtitle: "",
-	siteStartedAt: "2026-01-01",
+	siteStartedAt: "2026-11-05",
 	lang: "zh_CN",
 	themeColor: { hue: 345, fixed: false },
 	banner: {
