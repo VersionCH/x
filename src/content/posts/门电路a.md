@@ -1,5 +1,5 @@
 ---
-title: "门电路a"
+title: "门电路"
 published: 2026-11-07
 draft: false
 hidden: false
