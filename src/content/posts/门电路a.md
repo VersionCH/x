@@ -10,4 +10,4 @@ category: null
 lang: ""
 ---
 
-<iframe src="/HTML/MDL.html" width="100%" height="800px" frameborder="0" style="border: 1px solid #ccc; border-radius: 8px;"></iframe>
+<iframe src="/html/MDL.html" width="100%" height="800px" frameborder="0" style="border: 1px solid #ccc; border-radius: 8px;"></iframe>
