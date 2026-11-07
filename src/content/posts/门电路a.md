@@ -3,10 +3,10 @@ title: "门电路"
 published: 2026-11-07
 draft: false
 hidden: false
-description: ""
+description: "学习的第一课"
 image: ""
-tags: []
-category: null
+tags: ["数字电路"]
+category: "数字电路"
 lang: ""
 ---
 
